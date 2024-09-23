@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if ! id -u _mdns-repeater >/dev/null 2>&1; then
+  useradd -s /sbin/nologin -L daemon -d /var/empty _mdns-repeater
+fi
+
+install -m 755 -o _mdns-repeater -g wheel -d /var/run/mdns-repeater
+install -m 755 mdns-repeater /usr/local/sbin/mdns-repeater
+install -m 755 rc.d/mdns_repeater /etc/rc.d/mdns_repeater
+

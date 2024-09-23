@@ -1,5 +1,7 @@
 # Makefile for mdns-repeater
 
+RM = rm -f
+CP = cp -p
 
 ZIP_NAME = mdns-repeater-$(HGVERSION)
 
@@ -11,22 +13,24 @@ HGVERSION=$(shell hg parents --template "{latesttag}.{latesttagdistance}")
 
 CFLAGS=-Wall
 
-ifdef DEBUG
-CFLAGS+= -g
-else
-CFLAGS+= -Os
-LDFLAGS+= -s
-endif
+CFLAGS_DEBUG=-g
+
+CFLAGS_RELEASE=-Os
+LDFLAGS_RELEASE=-s
+
+CFLAGS += $(if $(DEBUG), $(CFLAGS_DEBUG), $(CFLAGS_RELEASE))
+LDFLAGS += $(if $(DEBUG), $(LDFLAGS_DEBUG), $(LDFLAGS_RELEASE))
 
 CFLAGS+= -DHGVERSION="\"${HGVERSION}\""
+
+OBJ = mdns-repeater.o
 
 .PHONY: all clean
 
 all: mdns-repeater
 
-mdns-repeater.o: _hgversion
-
-mdns-repeater: mdns-repeater.o
+mdns-repeater: $(OBJ)
+	$(CC) -o $@ $(OBJ)
 
 .PHONY: zip
 zip: TMPDIR := $(shell mktemp -d)
@@ -47,4 +51,11 @@ clean:
 	-$(RM) _hgversion
 	-$(RM) mdns-repeater
 	-$(RM) mdns-repeater-*.zip
+
+.PHONY: pkg
+pkg: mdns-repeater
+	$(CP) mdns-repeater pkg/
+
+install: pkg
+	cd pkg && ./INSTALL
 

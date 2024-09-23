@@ -1,0 +1,5 @@
+@pkgpath mdns-repeater
+@name mdns-repeater-1.0
+@version 1.0
+@comment simple mdns repeater
+@exec INSTALL
